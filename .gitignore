@@ -1,0 +1,95 @@
+# =========================
+# Python
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# =========================
+# Virtual Environment
+# =========================
+.venv/
+venv/
+env/
+ENV/
+
+# =========================
+# Environment / Secrets
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# IDE
+# =========================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# =========================
+# OS files
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# Logs
+# =========================
+*.log
+logs/
+
+# =========================
+# Testing / Coverage
+# =========================
+.pytest_cache/
+.coverage
+htmlcov/
+.coverage.*
+.tox/
+.nox/
+
+# =========================
+# Chroma / Vector DB
+# =========================
+chroma_db/
+.chroma/
+vectorstore/chroma/
+vectorstore/*.db
+
+# =========================
+# Generated model/cache files
+# =========================
+.cache/
+cache/
+hf_cache/
+*.bin
+*.safetensors
+*.onnx
+
+# =========================
+# Jupyter
+# =========================
+.ipynb_checkpoints/
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.bak
+
+# =========================
+# Python build
+# =========================
+build/
+dist/
+*.egg-info/
+
+# =========================
+# Streamlit
+# =========================
+.streamlit/secrets.toml
