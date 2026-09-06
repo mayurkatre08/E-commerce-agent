@@ -5,7 +5,8 @@ An agentic customer-support application for an e-commerce store. It combines a F
 ## Features
 
 - Answers questions about returns, exchanges, shipping, sizing, payments, and cancellations using policy documents.
-- Looks up orders with optional customer ownership verification.
+- Requires customer authentication before accessing customer-specific data or actions.
+- Looks up orders with customer ownership enforced by the backend.
 - Cancels eligible orders and changes sizes for orders that are still processing.
 - Escalates complex or unresolved requests to a human support ticket.
 - Exposes runtime metrics and optional LangSmith tracing.
@@ -91,31 +92,39 @@ Open the Streamlit URL shown in the terminal, usually `http://localhost:8501`. T
 | Method | Endpoint | Purpose |
 | --- | --- | --- |
 | `GET` | `/health` | Check API and graph readiness |
-| `POST` | `/chat` | Run one support conversation turn |
-| `GET` | `/order/{order_id}` | Look up an order directly |
+| `POST` | `/auth/token` | Log in and issue a customer JWT |
+| `POST` | `/chat` | Run one authenticated support conversation turn |
+| `GET` | `/order/{order_id}` | Look up an owned order directly |
 | `GET` | `/metrics` | Get observability metrics |
 
-Example chat request:
+Log in with the seeded customer identity, then send the JWT as a bearer token:
 
 ```powershell
+ $token = (Invoke-RestMethod -Method Post -Uri http://localhost:8000/auth/token `
+    -ContentType 'application/json' `
+    -Body '{"customer_id":"C001","email":"alice@example.com"}').access_token
+
 Invoke-RestMethod -Method Post -Uri http://localhost:8000/chat `
+    -Headers @{ Authorization = "Bearer $token" } `
   -ContentType 'application/json' `
-  -Body '{"message":"Where is my order?","customer_id":"C001","order_id":"ORD9001"}'
+    -Body '{"message":"Where is my order?","order_id":"ORD9001"}'
 ```
 
 The seeded database includes predictable examples such as `ORD9001` for customer `C001` and `ORD9002` for customer `C002`.
 
 ## MCP Tools
 
-The MCP server exposes five tools:
+The MCP server exposes seven tools:
 
 - `policy_search`
-- `get_order`
+- `get_order` (requires and verifies customer identity)
+- `list_orders` (returns every order owned by the authenticated customer)
+- `request_return` (creates a return request for an owned order)
 - `cancel_order`
 - `change_size`
 - `escalate_to_human`
 
-Order mutations verify the customer ID. Cancellation and size changes are only allowed while an order has `processing` status.
+The agent handles conversation and tool selection; authentication identifies the customer; backend authorization ensures the customer can access only their own orders, returns, refunds, and tickets. Cancellation and size changes are only allowed while an order has `processing` status.
 
 ## Tests
 
